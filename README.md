@@ -83,7 +83,7 @@ Se você configurou o `type: NodePort` no `service.yaml`, acesse a aplicação v
 curl http://localhost:30000
 ```
 
-Você deve ver: `Hello, Kubernetes! 👋` 
+Você deve ver: `Hello, Kubernetes! 👋`
 
 ---
 

@@ -1,49 +1,33 @@
-name: CI/CD Pipeline
+name: CI/CD Docker Deploy
 
 on:
   push:
     branches:
-      - main  # Isso garante que o workflow será acionado quando houver um push para a branch main
-  pull_request:
-    branches:
-      - main  # Isso pode ser usado para rodar o CI também em PRs para a branch main
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v2
+      - name: Check out the repository
+        uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-    - name: Build and push Docker image
-      run: |
-        docker build -t lfmacedo/go-k8s-cicd-example:latest .
-        docker push lfmacedo/go-k8s-cicd-example:latest
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: docker.io/your-username/go-k8s-cicd-example:latest
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check out the repository
-      uses: actions/checkout@v2
-
-    - name: Set up Kubeconfig
-      run: |
-        echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
-        export KUBECONFIG=kubeconfig
-
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl set image deployment/go-k8s-app go-k8s-app=lfmacedo/go-k8s-cicd-example:latest
-        kubectl rollout status deployment/go-k8s-app
+      # Removido a etapa com kubectl

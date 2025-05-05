@@ -27,8 +27,8 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t your-username/go-k8s-cicd-example:latest .
-        docker push your-username/go-k8s-cicd-example:latest
+        docker build -t lfmacedo/go-k8s-cicd-example:latest .
+        docker push lfmacedo/go-k8s-cicd-example:latest
 
   deploy:
     needs: build

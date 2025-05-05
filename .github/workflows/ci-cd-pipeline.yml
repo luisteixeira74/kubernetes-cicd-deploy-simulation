@@ -28,6 +28,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: docker.io/your-username/go-k8s-cicd-example:latest
+          tags: docker.io/lfmacedo/go-k8s-cicd-example:latest
 
       # Removido a etapa com kubectl

@@ -45,5 +45,5 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl set image deployment/go-k8s-app go-k8s-app=your-username/go-k8s-cicd-example:latest
+        kubectl set image deployment/go-k8s-app go-k8s-app=lfmacedo/go-k8s-cicd-example:latest
         kubectl rollout status deployment/go-k8s-app

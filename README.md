@@ -1,23 +1,30 @@
 # go-k8s-cicd-example
 
-Este projeto demonstra um pipeline CI/CD simples usando GitHub Actions, Docker Hub e um cluster Kubernetes local (via kind ou minikube). A aplicação é um serviço HTTP simples escrito em Go, com deploy automatizado da imagem no Docker Hub.
+![CI/CD](https://github.com/luisteixeira74/kubernetes-cicd-deploy-simulation/actions/workflows/docker-deploy.yml/badge.svg)
+
+Este projeto demonstra um pipeline CI/CD simples usando **GitHub Actions**, **Docker Hub** e um cluster **Kubernetes local** (via Kind ou Minikube).  
+A aplicação é um serviço HTTP simples escrito em Go, com deploy automatizado da imagem no Docker Hub.
+
+---
 
 ## 📦 Requisitos
 
 - **Go (Golang)** — aplicação principal
-- **Docker** — criação de imagem
+- **Docker** — criação da imagem
 - **Docker Hub** — armazenamento da imagem
 - **GitHub Actions** — pipeline CI/CD automatizado
-- **Kubernetes (Kind)** — cluster local para deploy
-- **kubectl** — para gerenciar o cluster local
+- **Kubernetes (Kind ou Minikube)** — cluster local para deploy
+- **kubectl** — para gerenciar o cluster
+
+---
 
 ## 🚀 Setup local
 
 1. Clone o repositório:
 
 ```bash
-git clone https://github.com/seu-usuario/go-k8s-cicd-example.git
-cd go-k8s-cicd-example
+git clone https://github.com/luisteixeira74/kubernetes-cicd-deploy-simulation.git
+cd kubernetes-cicd-deploy-simulation
 ```
 
 2. Construa a imagem localmente (opcional):
@@ -39,33 +46,43 @@ kubectl apply -f k8s/deployment.yaml
 curl http://localhost:8080/hello
 ```
 
+---
+
 ## ☁️ GitHub Actions (CI/CD)
 
-O workflow está em `.github/workflows/docker-deploy.yml`.
+O workflow está em:  
+`.github/workflows/docker-deploy.yml`
 
-### O que faz:
+### O que ele faz:
 
-- Build da imagem Docker.
-- Push da imagem para Docker Hub.
-- ⚠️ **Não realiza o deploy no cluster automaticamente**. Isso ocorre porque o GitHub Actions não tem acesso ao seu cluster local.
+- ✅ Faz o build da imagem Docker
+- ✅ Faz o push da imagem para o Docker Hub
+- ⚠️ **Não realiza o deploy no cluster automaticamente**  
+  (isso ocorre porque o GitHub Actions não tem acesso ao seu cluster local)
 
-### Como tratar isso:
+### Como realizar o deploy:
 
-- O deploy no cluster deve ser feito manualmente com:
+Manual, com:
 
 ```bash
 kubectl set image deployment/go-k8s-app go-k8s-container=lfmacedo/go-k8s-cicd-example:latest
 kubectl rollout status deployment/go-k8s-app
 ```
 
+---
+
 ## 🔐 Secrets necessários no GitHub
 
-Crie estes secrets no GitHub (Settings > Secrets and variables > Actions):
+Crie os seguintes *secrets* em:
+
+`Settings > Secrets and variables > Actions`
 
 | Nome                | Descrição                          |
-|---------------------|--------------------------------------|
-| `DOCKER_USERNAME`   | Seu nome de usuário Docker Hub       |
-| `DOCKER_PASSWORD`   | Senha da sua conta Docker Hub        |
+|---------------------|-----------------------------------|
+| `DOCKER_USERNAME`   | Seu nome de usuário no Docker Hub |
+| `DOCKER_PASSWORD`   | Senha da sua conta Docker Hub     |
+
+---
 
 ## 📁 Estrutura do projeto
 
@@ -73,13 +90,19 @@ Crie estes secrets no GitHub (Settings > Secrets and variables > Actions):
 .
 ├── Dockerfile
 ├── main.go
-├── k8s
-│ ├── deployment.yaml # Deployment + Service com imagem final
-│ └── service-nodeport.yaml # Exposição do serviço via NodePort (padrão opcional)
-└── .github
-└── workflows
-└── docker-deploy.yml # Pipeline de CI/CD (sem deploy automático)
+├── app/
+│   ├── handler.go            # Lógica da API
+│   └── handler_test.go       # Teste da API (GET /hello)
+├── k8s/
+│   ├── deployment.yaml       # Deployment + Service
+│   └── service-nodeport.yaml # Exposição via NodePort
+├── .github/
+│   └── workflows/
+│       └── docker-deploy.yml # CI/CD pipeline
+
 ```
+
+---
 
 ## ✅ Testando a imagem publicada
 
@@ -91,24 +114,40 @@ curl http://localhost:8080/hello
 
 ---
 
-✅ Deploy Manual com kubectl
-Suba o cluster local (caso use Kind):
+## ☸️ Deploy Manual com kubectl (Kind)
 
+1. Suba o cluster local com Kind:
+
+```bash
 kind create cluster --name go-cicd
-Aplique os manifests do Kubernetes:
+```
 
+2. Aplique os manifests do Kubernetes:
+
+```bash
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service-nodeport.yaml
+```
 
-Verifique os pods:
+3. Verifique os pods:
+
+```bash
 kubectl get pods
+```
 
-Verifique o serviço:
+4. Verifique o serviço:
+
+```bash
 kubectl get svc
+```
 
-Acesse a aplicação localmente (porta 8080):
+5. Acesse a aplicação localmente (porta 8080):
 
+```bash
 curl http://localhost:8080/hello
+```
 
-Deve retornar:
+**Retorno esperado:**
+```
 Hello, World!
+```

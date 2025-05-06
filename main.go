@@ -1,20 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/luisteixeira74/kubernetes-cicd-deploy-simulation/app"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, World!")
-}
-
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-
-	port := "8080"
-	fmt.Printf("Server running on port %s\n", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		panic(err)
-	}
+	http.HandleFunc("/", app.RootHandler)
+	http.ListenAndServe(":8080", nil)
 }
